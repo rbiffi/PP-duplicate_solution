@@ -99,17 +99,17 @@ def read_and_amend_customizations_file(path, words, components):
     connection_references = {}
 
     tree = ET.parse(customizations_file_path)
-    customization_root = tree.getroot().find("Workflows")
-    for workflow in customization_root.findall("Workflow"):
+    root = tree.getroot()
+    for workflow in root.find("Workflows").findall("Workflow"):
         workflow.find("IntroducedVersion").text = "1.0.0.0"
 
-    for connection_reference in customization_root.findall("connectionreferences"):
-        logical_name = connection_reference.get("connectionreferencelogicalname").text
+    for connection_reference in root.find("connectionreferences").findall(
+        "connectionreference"
+    ):
+        logical_name = connection_reference.get("connectionreferencelogicalname")
         new_logical_name = logical_name[0:-5] + str(uuid.uuid4())[-5:]
         connection_references[logical_name] = new_logical_name
-        connection_reference.get("connectionreferencelogicalname").text = (
-            new_logical_name
-        )
+        connection_reference.set("connectionreferencelogicalname", new_logical_name)
 
     tree.write(customizations_file_path)
 
