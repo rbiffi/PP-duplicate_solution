@@ -1,4 +1,3 @@
-import json
 import os
 import shutil
 import zipfile
@@ -39,21 +38,11 @@ def parse_command_line():
 
 
 def extract_zip_file(path):
-    with zipfile.ZipFile(path, "r") as zip_ref:
-        zip_ref.extractall(path=os.path.dirname(path))
-
-    # move extracted files in folder tmp
+    # create temp folder for extracted files
     os.mkdir(f"{os.path.dirname(path)}/tmp")
-    root, dirs, files = os.walk(os.path.dirname(path)).__next__()
 
-    for file in files:
-        if file == os.path.basename(path):
-            continue
-        shutil.move(os.path.join(root, file), f"{os.path.dirname(path)}/tmp")
-    for dir in dirs:
-        if dir == "tmp":
-            continue
-        shutil.move(os.path.join(root, dir), f"{os.path.dirname(path)}/tmp")
+    with zipfile.ZipFile(path, "r") as zip_ref:
+        zip_ref.extractall(path=f"{os.path.dirname(path)}/tmp")
 
     return f"{os.path.dirname(path)}/tmp"
 
@@ -220,7 +209,7 @@ if __name__ == "__main__":
     )
 
     new_solution_name = (
-        replace_words(os.path.basename(zip_path).split(".")[0], words_to_replace)[0:-8]
+        replace_words(os.path.basename(zip_path).split("_")[0], words_to_replace)
         + "_1_0_0_0"
     )
 
